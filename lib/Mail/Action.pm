@@ -3,13 +3,15 @@ package Mail::Action;
 use strict;
 
 use vars '$VERSION';
-$VERSION = '0.30';
+$VERSION = '0.40';
 
 use Carp 'croak';
 
 use Mail::Mailer;
-use Mail::Address;
-use Mail::Message;
+use Email::Address;
+
+use Email::MIME;
+use Email::MIME::Modifier;
 
 use Mail::Action::PodToHelp;
 
@@ -37,7 +39,9 @@ sub new
 	{
 		Storage => $options{Storage} || $options{Addresses}
 			                         || $storage->new( $address_dir ),
-		Message => $options{Message} || Mail::Message->read( $fh ),
+		Message => $options{Message} || Email::MIME->new(
+			scalar ( defined( fileno( $fh ) ) ? do { local $/; <$fh> } : $fh )
+		),
 	}, $class;
 }
 
@@ -56,7 +60,7 @@ sub message
 sub fetch_address
 {
 	my $self      = shift;
-	my $alias     = $self->parse_alias( $self->message()->get( 'to' ) );
+	my $alias     = $self->parse_alias( $self->message->header( 'To' ) );
 	my $addresses = $self->storage();
 
 	return unless $addresses->exists( $alias );
@@ -70,7 +74,7 @@ sub command_help
 {
 	my ($self, $pod, @headings) = @_;
 
-	my $from   = $self->address_field( 'from' );
+	my $from   = $self->address_field( 'From' );
 	my $parser = Mail::Action::PodToHelp->new();
 
 	$parser->show_headings( @headings );
@@ -88,7 +92,7 @@ sub command_help
 sub address_field
 {
 	my ($self, $field) = @_;
-	my @values = Mail::Address->parse( $self->message->get( $field ) );
+	my @values = Email::Address->parse( $self->message->header( $field ) );
 	return wantarray ? @values : $values[0]->format();
 }
 
@@ -96,8 +100,7 @@ sub process_body
 {
 	my ($self, $address) = @_;
 	my $attributes       = $address->attributes();
-	my $message_body     = $self->message->body->decoded();
-	my $body             = $message_body->stripSignature();
+	my $body             = $self->remove_sig();
 
 	while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
 	{
@@ -107,6 +110,23 @@ sub process_body
 	}
 
 	return $body;
+}
+
+sub remove_sig
+{
+	my $self    = shift;
+	my $message = $self->message();
+	my $body    = ( $message->parts() )[0]->body();
+
+	my @lines;
+	
+	for my $line (split(/\n/, $body))
+	{
+		last if $line eq '-- ';
+		push @lines, $line;
+	}
+
+	return \@lines;
 }
 
 sub reply
@@ -122,7 +142,7 @@ sub reply
 sub find_command
 {
 	my $self      = shift;
-	my ($subject) = $self->message->subject() =~ /^\*(\w+)\*/;
+	my ($subject) = $self->message->header( 'Subject' ) =~ /^\*(\w+)\*/;
 
 	return unless $subject;
 
@@ -133,12 +153,13 @@ sub find_command
 sub copy_headers
 {
 	my $self    = shift;
-	my $headers = $self->message->head();
+	my $headers = $self->message->{head};
 
 	my %copy;
-	for my $header ( $headers->names() )
+	for my $header ( keys %$headers )
 	{
-		$copy{ ucfirst( $header ) } = join(', ', $headers->get( $header ));
+		$copy{ ucfirst( lc( $header ) ) }
+			= join(', ', @{ $headers->{ $header } });
 	}
 
 	delete $copy{'From '};
@@ -287,7 +308,7 @@ L<Mail::Action::PodToHelp> for related modules.
 
 =head1 AUTHOR
 
-chromatic, C<chromatic@wgz.org>.
+chromatic, C<chromatic at wgz dot org>.
 
 =head1 BUGS
 

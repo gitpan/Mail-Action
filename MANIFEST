@@ -8,6 +8,7 @@ lib/Mail/Action/Address.pm
 lib/Mail/Action/Storage.pm
 lib/Mail/Action/PodToHelp.pm
 README
+t/action.t
 t/address.t
 t/address_roles.t
 t/podtohelp.t

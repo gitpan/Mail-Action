@@ -1,8 +1,16 @@
+0.40
+	Sun Jul 11 03:27:54 UTC 2004 ($Rev: 39 $, $Author: chromatic $)
+	- port to Email::Simple and Email::MIME
+	- added remove_sig()
+	- mark build requirements in Build.PL
+	- added t/action.t
+	- added t/address_roles.t (not in version control previously, oops)
+
 0.30
-	Mon Mar 15 05:57:26 UTC 2004 ($Rev: 31 $, $Author: chromatic $)
+	Mon Mar 15 05:57:26 UTC 2004 (Rev: 31, $Author: chromatic $)
 	- fix spelling of Simon's name in README (sorry)
 
-	Mon Mar 15 04:51:15 UTC 2004 (Rev: 28 $, $Author: chromatic $)
+	Mon Mar 15 04:51:15 UTC 2004 (Rev: 28, Author: chromatic)
 	- bumped up version number
 	- mark dependency on Mail::Box in Build.PL
 	- minor README copyright date tweak
