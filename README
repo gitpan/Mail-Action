@@ -40,9 +40,9 @@ approaches and as I come up with more ideas.
 LICENSE, COPYRIGHT, and CREDITS
 -------------------------------
 
-Copyright 2003, chromatic <chromatic@wgz.org>
+Copyright 2003 - 2004, chromatic <chromatic@wgz.org>
 
 This software is made available under the same license as Perl.
 
 This software would not have been possible without the inspiration of Simon
-Cozen's Mail::Audit.  Thanks to the Perl Monks for helping choose this name.
+Cozens' Mail::Audit.  Thanks to the Perl Monks for helping choose this name.

@@ -1,28 +1,28 @@
 --- #YAML:1.0
 name: Mail-Action
-version: 0.20
+version: 0.30
+author:
+  - chromatic, C<chromatic@wgz.org>.
+abstract: |-
+  base for building modules that act on incoming mail
 license: perl
-distribution_type: module
 requires:
   Class::Roles: 0.30
   Mail::Address: 1.53
-  Mail::Internet: 1.53
+  Mail::Box: ''
   Pod::Simple: ''
   Test::Exception: ''
   Test::MockObject: 0.11
   Test::Simple: 0.47
   YAML: 0.35
-recommends: {}
-build_requires: {}
-conflicts: {}
 provides:
   Mail::Action:
     file: lib/Mail/Action.pm
-    version: 0.20
+    version: 0.30
   Mail::Action::Address:
     file: lib/Mail/Action/Address.pm
   Mail::Action::PodToHelp:
     file: lib/Mail/Action/PodToHelp.pm
   Mail::Action::Storage:
     file: lib/Mail/Action/Storage.pm
-generated_by: Module::Build version 0.20
+generated_by: Module::Build version 0.24

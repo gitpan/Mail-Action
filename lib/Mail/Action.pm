@@ -3,13 +3,13 @@ package Mail::Action;
 use strict;
 
 use vars '$VERSION';
-$VERSION = '0.20';
+$VERSION = '0.30';
 
 use Carp 'croak';
 
 use Mail::Mailer;
 use Mail::Address;
-use Mail::Internet;
+use Mail::Message;
 
 use Mail::Action::PodToHelp;
 
@@ -37,7 +37,7 @@ sub new
 	{
 		Storage => $options{Storage} || $options{Addresses}
 			                         || $storage->new( $address_dir ),
-		Message => $options{Message} || Mail::Internet->new( $fh ),
+		Message => $options{Message} || Mail::Message->read( $fh ),
 	}, $class;
 }
 
@@ -96,7 +96,8 @@ sub process_body
 {
 	my ($self, $address) = @_;
 	my $attributes       = $address->attributes();
-	my $body             = $self->message->body();
+	my $message_body     = $self->message->body->decoded();
+	my $body             = $message_body->stripSignature();
 
 	while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
 	{
@@ -105,21 +106,7 @@ sub process_body
 		shift @$body;
 	}
 
-	return $self->remove_signature( $body );
-}
-
-sub remove_signature
-{
-	my ($self, $body) = @_;
-
-	my @newbody;
-
-	while (@$body and $body->[0] !~ /^-- $/)
-	{
-		push @newbody, shift @$body;
-	}
-
-	return \@newbody;
+	return $body;
 }
 
 sub reply
@@ -135,7 +122,7 @@ sub reply
 sub find_command
 {
 	my $self      = shift;
-	my ($subject) = $self->message->get('Subject') =~ /^\*(\w+)\*/;
+	my ($subject) = $self->message->subject() =~ /^\*(\w+)\*/;
 
 	return unless $subject;
 
@@ -146,13 +133,13 @@ sub find_command
 sub copy_headers
 {
 	my $self    = shift;
-	my $headers = $self->message->head->header_hashref();
+	my $headers = $self->message->head();
+
 	my %copy;
-	@copy{ map { ucfirst( $_ ) } keys %$headers } = map {
-		my $line = UNIVERSAL::isa( $_, 'ARRAY' ) ? join(', ', @$_) : $_;
-		chomp $line;
-		$line;
-	} values %$headers;
+	for my $header ( $headers->names() )
+	{
+		$copy{ ucfirst( $header ) } = join(', ', $headers->get( $header ));
+	}
 
 	delete $copy{'From '};
 	return \%copy;
@@ -308,6 +295,6 @@ No known bugs.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, chromatic.  All rights reserved.  This module is
+Copyright (c) 2003 - 2004, chromatic.  All rights reserved.  This module is
 distributed under the same terms as Perl itself, in the hope that it is useful
 but certainly under no guarantee.  Hey, it's free.

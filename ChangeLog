@@ -1,8 +1,21 @@
+0.30
+	Mon Mar 15 05:57:26 UTC 2004 ($Rev: 31 $, $Author: chromatic $)
+	- fix spelling of Simon's name in README (sorry)
+
+	Mon Mar 15 04:51:15 UTC 2004 (Rev: 28 $, $Author: chromatic $)
+	- bumped up version number
+	- mark dependency on Mail::Box in Build.PL
+	- minor README copyright date tweak
+
+	Thu Mar 11 01:26:41 UTC 2004 (Rev: 28, Author: chromatic)
+	- ported to use Mail::Message from Mail::Internet
+	- added author keyword expansion to ChangeLog
+
 0.20
-	Sun Dec 14 01:00:37 UTC 2003 ($Rev$)
+	Sun Dec 14 01:00:37 UTC 2003 (Rev: 26)
 	- improve version number in module
 
-	Sat Dec 13 23:06:11 UTC 2003 (Rev: 25 $)
+	Sat Dec 13 23:06:11 UTC 2003 (Rev: 25)
 	- made Mail::Action::Address supply roles instead of superclass
 	- updated tests
 	- updated documentation
