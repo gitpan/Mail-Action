@@ -1,0 +1,21 @@
+0.20
+	Sun Dec 14 01:00:37 UTC 2003 ($Rev$)
+	- improve version number in module
+
+	Sat Dec 13 23:06:11 UTC 2003 (Rev: 25 $)
+	- made Mail::Action::Address supply roles instead of superclass
+	- updated tests
+	- updated documentation
+	- add dependency on Class::Roles
+
+	Thu Dec 11 05:42:18 UTC 2003 (Rev: 24)
+	- filled out Mail::Action::Address
+	- added docs
+	- updated version for 0.20 release
+
+0.10
+	Sun Nov  2 05:26:08 UTC 2003 (Rev: 23)
+	- added Mail::Action::Storage and Mail::Action::Address and tests 
+
+	Sun Nov  2 03:34:28 UTC 2003 (Rev: 22)
+	- initial creation

@@ -1,0 +1,48 @@
+Mail::Action README
+-----------------------
+
+Version 0.10
+
+Mail::Action is a set of modules for building modules to perform actions based
+on incoming messages.  See Mail::SimpleList and Mail::TempAddress for ideas.
+
+INSTALLATION
+------------
+
+First, run the Build.PL file to create the Build program.  Then install as
+normal:
+
+	$ ./Build
+	$ ./Build test
+	$ sudo ./Build install
+
+All of the tests should pass.  If not, please send the complete diagnostic
+output to the author and we'll try to fix the bugs.  This should work on any
+Unix system and probably elsewhere, but that'll depend on several other
+components.
+
+USAGE
+-----
+
+This information is also contained within the POD of Mail::Action:
+
+	$ perldoc Mail::Action
+
+You'll have to write code.
+
+ENHANCEMENTS
+-------------
+
+This is intended to contain code shared between Mail::SimpleList and
+Mail::TempAddress.  It may grow slightly larger as I figure out better
+approaches and as I come up with more ideas.
+
+LICENSE, COPYRIGHT, and CREDITS
+-------------------------------
+
+Copyright 2003, chromatic <chromatic@wgz.org>
+
+This software is made available under the same license as Perl.
+
+This software would not have been possible without the inspiration of Simon
+Cozen's Mail::Audit.  Thanks to the Perl Monks for helping choose this name.

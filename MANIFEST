@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+MANIFEST
+Makefile.PL
+META.yml
+lib/Mail/Action.pm
+lib/Mail/Action/Address.pm
+lib/Mail/Action/Storage.pm
+lib/Mail/Action/PodToHelp.pm
+README
+t/address.t
+t/address_roles.t
+t/podtohelp.t
+t/storage.t
