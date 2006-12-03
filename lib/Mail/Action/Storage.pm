@@ -1,6 +1,10 @@
 package Mail::Action::Storage;
 
 use strict;
+use warnings;
+
+use vars '$VERSION';
+$VERSION = '0.42';
 
 use YAML;
 

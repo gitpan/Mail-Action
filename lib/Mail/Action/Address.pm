@@ -1,8 +1,13 @@
 package Mail::Action::Address;
 
 use strict;
+use warnings;
 
-use Class::Roles multi => {
+use vars '$VERSION';
+$VERSION = '0.42';
+
+use Class::Roles multi =>
+{
 	address_expires    => [qw( expires process_time )],
 	address_named      => [qw( name )],
 	address_described  => [qw( description )],
@@ -28,7 +33,8 @@ sub expires
 {
 	my $self = shift;
 	$self->{expires} = $self->process_time( shift ) + time() if @_;
-	return $self->{expires} || 0;
+	$self->{expires} = 0 unless $self->{expires};
+	return $self->{expires};
 }
 
 sub process_time
@@ -85,12 +91,12 @@ classes.
 
 =head2 C<address_expires>
 
-Allows Address instances to have an optional expiration date.  This adds one
-method to the class to which it is applied:
+Allows Address instances to have an optional expiration date.  This adds two
+method to the class to which you apply it:
 
 =over 4
 
-=item * expires( [ $timestring ] )
+=item C<expires( $timestring )>
 
 Gets and sets the time at which this Address will expire.  Set this time in a
 simple text string, such as C<7d2h>.  Valid time units are:
@@ -107,34 +113,38 @@ simple text string, such as C<7d2h>.  Valid time units are:
 
 =item * C<M>, for month.  This is thirty (30) days.
 
-Times are returned in epoch seconds.
+The returned time is in epoch seconds.
 
 =back
+
+=item * C<process_time( $timestring )>
+
+Turns a C<$timestring> into the number of seconds it represents.
 
 =back
 
 =head2 C<address_named>
 
 Allows Address instances to have a name.  This adds one method to the class to
-which it is applied:
+which you apply it:
 
 =over 4
 
-=item * name( [ $name ] )
+=item C<name( $name )>
 
-Gets and sets the name associated with this Address.  This name will be
-stripped of all non-alphanumeric characters, including spaces and punctuation.
+Gets and sets the name associated with this Address.  This method strips the
+name of all non-alphanumeric characters, including spaces and punctuation.
 
 =back
 
 =head2 C<address_described>
 
 Allows Address instances to have a one-sentence description.  This adds one
-method to the class to which it is applied:
+method to the class to which you apply it:
 
 =over 4
 
-=item * description( [ $description ] )
+=item C<description( $description )>
 
 Gets and sets the description of this Address.  This will return the empty
 string if there is no description.
@@ -143,7 +153,7 @@ string if there is no description.
 
 =head1 AUTHOR
 
-chromatic, C<chromatic@wgz.org>
+chromatic, C<< chromatic at wgz dot org >>
 
 =head1 BUGS
 
@@ -155,6 +165,5 @@ L<Class::Roles>, L<Mail::TempAddress::Address>, L<Mail::SimpleList::Alias>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, chromatic.  All rights reserved.  This module is
-distributed under the same terms as Perl itself, in the hope that it is useful
-but certainly under no guarantee.
+Copyright (c) 2003, 2005 chromatic.  All rights reserved.  You may use, modify,
+and distribute this module under the same terms as Perl 5.8.x itself.

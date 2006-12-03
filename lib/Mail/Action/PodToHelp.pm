@@ -3,6 +3,9 @@ package Mail::Action::PodToHelp;
 use strict;
 use base 'Pod::Simple::Text';
 
+use vars '$VERSION';
+$VERSION = '0.42';
+
 sub show_headings
 {
 	my $parser = shift;
@@ -57,12 +60,47 @@ __END__
 
 Mail::SimpleList::PodToHelp - module to produce help messages from the MSL docs
 
+=head1 DESCRIPTION
+
+This is a subclass of C<Pod::Simple>.  It overrrides the following methods:
+
+=over 4
+
+=item C<start_head1()>
+
+Marks that the parser has encountered a first-level heading.
+
+=item C<end_head1()>
+
+Marks that the parser is outside of a first-level heading.
+
+=item C<start_item_bullet()>
+
+Ignores any bullets unless the parser should show them.
+
+=item C<end_item_bullet()>
+
+Ignores any bullets unless the parser should show them.
+
+=item C<handle_text()>
+
+Tells the parser to handle the text if it is in a section with the appropriate
+heading.  Otherwise, handles nothing.
+
+That is -- if the parser has encountered the text of a first level heading for which it should show the text, sets a flag.  Otherwise, unsets the flag.
+
+=item C<show_headings()>
+
+Tells the parser to show all POD under the headings provided.
+
+=back
+
 =head1 SEE ALSO
 
 L<Pod::Simple>, L<Pod::Simple::Text>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, chromatic.  All rights reserved.  This module is
+Copyright (c) 2003 - 2005, chromatic.  All rights reserved.  This module is
 distributed under the same terms as Perl itself, in the hope that it is useful
 but certainly under no guarantee.  Hey, it saved retyping.
