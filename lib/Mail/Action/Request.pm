@@ -4,234 +4,235 @@ use strict;
 use warnings;
 
 use vars '$VERSION';
-$VERSION = '0.42';
+$VERSION = '0.45';
 
 use Email::MIME;
 use Email::Address;
 use Email::MIME::Modifier;
-use Email::Simple::Headers;
 
 sub new
 {
-	my ($class, $message_text, @args) = @_;
-	my $message                       = Email::MIME->new( $message_text );
-	my $self                          = bless
-	{
-		Message   => $message,
-		headers   => {},
-		recipient => '',
-		@args,
-	}, $class;
+    my ($class, $message_text, @args) = @_;
+    my $message                       = Email::MIME->new( $message_text );
+    my $self                          = bless
+    {
+        Message   => $message,
+        headers   => {},
+        recipient => '',
+        @args,
+    }, $class;
 
-	$self->init();
+    $self->init();
 
-	return $self;
+    return $self;
 }
 
 sub init
 {
-	my $self = shift;
-	$self->add_headers();
-	$self->add_recipient();
-	$self->remove_recipient( $self->recipient_header(), $self->recipient() );
-	$self->find_key();
+    my $self = shift;
+    $self->add_headers();
+    $self->add_recipient();
+    $self->remove_recipient( $self->recipient_header(), $self->recipient() );
+    $self->find_key();
 }
 
 sub message
 {
-	my $self = shift;
-	   $self->{Message};
+    my $self = shift;
+       $self->{Message};
 }
 
 sub headers
 {
-	my $self = shift;
-	   $self->{headers};
+    my $self = shift;
+       $self->{headers};
 }
 
 BEGIN
 {
-	no strict 'refs';
+    no strict 'refs';
 
-	for my $attribute (qw( key recipient recipient_header ))
-	{
-		*{ $attribute } = sub
-		{
-			my $self = shift;
-			   $self->{$attribute} = shift if @_;
-			   $self->{$attribute};
-		};
-	}
+    for my $attribute (qw( key recipient recipient_header ))
+    {
+        *{ $attribute } = sub
+        {
+            my $self = shift;
+               $self->{$attribute} = shift if @_;
+               $self->{$attribute};
+        };
+    }
 }
 
 sub store_header
 {
-	my ($self, $header, $value) = @_;
-	my $headers                 = $self->headers();
-	$headers->{$header}         = $value;
+    my ($self, $header, $value) = @_;
+    my $headers                 = $self->headers();
+    $headers->{$header}         = $value;
 }
 
 sub recipient_headers
 {
-	return qw( Delivered-To To Cc );
+    return qw( Delivered-To To Cc );
 }
 
 sub header
 {
-	my ($self, $name) = @_;
-	my $headers       = $self->headers();
+    my ($self, $name) = @_;
+    my $headers       = $self->headers();
 
-	return $self->message->header( $name ) unless exists $headers->{$name};
-	return wantarray ? @{ $headers->{$name} } : $headers->{$name}[0];
+    return $self->message->header( $name ) unless exists $headers->{$name};
+    return wantarray ? @{ $headers->{$name} } : $headers->{$name}[0];
 }
 
 sub add_headers
 {
-	my $self = shift;
-	$self->find_headers(qw( Subject ));
-	$self->find_address_headers();
+    my $self = shift;
+    $self->find_headers(qw( Subject ));
+    $self->find_address_headers();
 }
 
 sub find_headers
 {
-	my ($self, @headers) = @_;
-	my $message          = $self->message();
+    my ($self, @headers) = @_;
+    my $message          = $self->message();
 
-	for my $header (map { ucfirst( lc( $_ ) ) } @headers)
-	{
-		$self->store_header( $header, [ $message->header( $header ) ] );
-	}
+    for my $header (map { ucfirst( lc( $_ ) ) } @headers)
+    {
+        $self->store_header( $header, [ $message->header( $header ) ] );
+    }
 }
 
 sub find_address_headers
 {
-	my $self    = shift;
-	my $message = $self->message();
+    my $self    = shift;
+    my $message = $self->message();
 
-	for my $header (map { ucfirst(lc($_)) } $self->recipient_headers(), 'From')
-	{
-		my @value = map { Email::Address->parse( $_ ) }
-			$message->header( $header );
-		$self->store_header( $header, \@value );
-	}
+    for my $header (map { ucfirst(lc($_)) } $self->recipient_headers(), 'From')
+    {
+        my @value = map { Email::Address->parse( $_ ) }
+            $message->header( $header );
+        $self->store_header( $header, \@value );
+    }
 }
 
 sub add_recipient
 {
-	my $self      = shift;
-	my $message   = $self->message();
-	my $recipient = $self->recipient();
+    my $self      = shift;
+    my $message   = $self->message();
+    my $recipient = $self->recipient();
 
-	if ($recipient)
-	{
-		$self->recipient_header( '' );
-	}
-	else
-	{
-		for my $header (map { ucfirst( lc( $_ ) ) } $self->recipient_headers())
-		{
-			next unless $recipient = $self->header( $header );
-			$self->recipient_header( $header );
-			last;
-		}
-	}
+    if ($recipient)
+    {
+        $self->recipient_header( '' );
+    }
+    else
+    {
+        for my $header (map { ucfirst( lc( $_ ) ) } $self->recipient_headers())
+        {
+            next unless $recipient = $self->header( $header );
+            $self->recipient_header( $header );
+            last;
+        }
+    }
 
-	$self->recipient( ( Email::Address->parse( $recipient ) )[0] );
+    $self->recipient( ( Email::Address->parse( $recipient ) )[0] );
 }
 
 sub remove_recipient
 {
-	my ($self, $header, $recipient) = @_;
-	my $recip_addy                  = $recipient->address();
+    my ($self, $header, $recipient) = @_;
+    use Carp;
+    Carp::cluck( 'no' ) unless $recipient;
+    my $recip_addy                  = $recipient->address();
 
-	for my $remove_header ( 'To', 'Cc' )
-	{
-		my ($found, @cleaned);
+    for my $remove_header ( 'To', 'Cc' )
+    {
+        my ($found, @cleaned);
 
-		my @addresses       = $self->header( $remove_header );
+        my @addresses       = $self->header( $remove_header );
 
-		while ( my $address = shift @addresses )
-		{
-			if ( not( $found ) and $address->address() eq $recip_addy )
-			{
-				push @cleaned, @addresses;
-				$found = 1;
-				last;
-			}
-			else
-			{
-				push @cleaned, $address;
-			}
-		}
+        while ( my $address = shift @addresses )
+        {
+            if ( not( $found ) and $address->address() eq $recip_addy )
+            {
+                push @cleaned, @addresses;
+                $found = 1;
+                last;
+            }
+            else
+            {
+                push @cleaned, $address;
+            }
+        }
 
-		next unless $found;
-		$self->store_header( $remove_header, \@cleaned );
-		return;
-	}
+        next unless $found;
+        $self->store_header( $remove_header, \@cleaned );
+        return;
+    }
 }
 
 sub find_key
 {
-	my $self      = shift;
+    my $self      = shift;
 
-	# be paranoid; explicitly copy captured match variables
-	$self->key( "$1" ) if $self->recipient() =~ /\+(\w+)/;
+    # be paranoid; explicitly copy captured match variables
+    $self->key( "$1" ) if $self->recipient() =~ /\+(\w+)/;
 }
 
 sub process_body
 {
-	my ($self, $address) = @_;
-	my $attributes       = $address->attributes();
-	my $body             = $self->remove_sig();
+    my ($self, $address) = @_;
+    my $attributes       = $address->attributes();
+    my $body             = $self->remove_sig();
 
-	while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
-	{
-		my ($directive, $value) = (lc( $1 ), $2);
-		$address->$directive( $value ) if exists $attributes->{ $directive };
-		shift @$body;
-	}
+    while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
+    {
+        my ($directive, $value) = (lc( $1 ), $2);
+        $address->$directive( $value ) if exists $attributes->{ $directive };
+        shift @$body;
+    }
 
-	return $body;
+    return $body;
 }
 
 sub remove_sig
 {
-	my $self    = shift;
-	my $message = $self->message();
-	my $body    = ( $message->parts() )[0]->body();
+    my $self    = shift;
+    my $message = $self->message();
+    my $body    = ( $message->parts() )[0]->body();
 
-	my @lines;
+    my @lines;
 
-	for my $line (split(/\n/, $body))
-	{
-		last if $line eq '-- ';
-		push @lines, $line;
-	}
+    for my $line (split(/\n/, $body))
+    {
+        last if $line eq '-- ';
+        push @lines, $line;
+    }
 
-	return \@lines;
+    return \@lines;
 }
 
 sub copy_headers
 {
-	my $self    = shift;
-	my $message = $self->message();
-	my $headers = $self->headers();
+    my $self    = shift;
+    my $message = $self->message();
+    my $headers = $self->headers();
 
-	my %copy;
+    my %copy;
 
-	for my $header ( $message->headers() )
-	{
-		next if $header eq 'From ';
+    for my $header ( $message->headers() )
+    {
+        next if $header eq 'From ';
 
-		my @value = exists $headers->{$header} ?
-						   $self->header( $header ) :
-						   $message->header( $header );
+        my @value = exists $headers->{$header} ?
+                           $self->header( $header ) :
+                           $message->header( $header );
 
-		next unless @value;
-		$copy{ ucfirst( lc( $header ) ) } = join(', ', @value);
-	}
+        next unless @value;
+        $copy{ ucfirst( lc( $header ) ) } = join(', ', @value);
+    }
 
-	return \%copy;
+    return \%copy;
 }
 
 1;
@@ -243,7 +244,7 @@ Mail::Action::Request - base for building modules that represent incoming mail
 
 =head1 SYNOPSIS
 
-	use base 'Mail::Action::Request';
+    use base 'Mail::Action::Request';
 
 =head1 DESCRIPTION
 
@@ -406,5 +407,5 @@ No known bugs.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 - 2005, chromatic.  Some rights reserved; you may use,
-distribute, and modify this module under the same terms as Perl 5.8.
+Copyright (c) 2003 - 2009 chromatic.  Some rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.10 itself.

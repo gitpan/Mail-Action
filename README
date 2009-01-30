@@ -1,5 +1,5 @@
-Mail::Action README
------------------------
+Mail::Action
+------------
 
 Version 0.45
 
@@ -13,9 +13,9 @@ First, run the Build.PL file to create the Build program.  Then install as
 normal:
 
     $ perl Build.PL
-	$ perl ./Build
-	$ perl ./Build test
-	$ sudo perl ./Build install
+    $ perl ./Build
+    $ perl ./Build test
+    $ sudo perl ./Build install
 
 All of the tests should pass.  If not, please send the complete diagnostic
 output to the author and we'll try to fix the bugs.  This should work on any
@@ -27,7 +27,7 @@ USAGE
 
 See the POD of Mail::Action for more information:
 
-	$ perldoc Mail::Action
+    $ perldoc Mail::Action
 
 You'll have to write code.
 
@@ -41,9 +41,9 @@ approaches and as I come up with more ideas.
 LICENSE, COPYRIGHT, and CREDITS
 -------------------------------
 
-Copyright 2003 - 2006, chromatic <chromatic@wgz.org>
+Copyright 2003 - 2009, chromatic <chromatic@wgz.org>
 
-This software is made available under the same license as Perl.
+This software is available under the same license as Perl 5.10.
 
 This software would not have been possible without the inspiration of Simon
 Cozens' Mail::Audit.  Thanks to the Perl Monks for helping choose this name.

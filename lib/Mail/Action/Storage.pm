@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars '$VERSION';
-$VERSION = '0.42';
+$VERSION = '0.45';
 
 use YAML;
 
@@ -17,33 +17,33 @@ use Mail::Action::Address;
 
 sub new
 {
-	my ($class, $directory) = @_;
-	croak 'No storage directory given' unless $directory;
+    my ($class, $directory) = @_;
+    croak 'No storage directory given' unless $directory;
 
-	bless { storage_dir => $directory }, $class;
+    bless { storage_dir => $directory }, $class;
 }
 
 sub stored_class
 {
-	'';
+    '';
 }
 
 sub storage_dir
 {
-	my $self = shift;
-	return $self->{storage_dir};
+    my $self = shift;
+    return $self->{storage_dir};
 }
 
 sub storage_extension
 {
-	'mas'
+    'mas'
 }
 
 sub storage_file
 {
-	my ($self, $name) = @_;
-	return File::Spec->catfile( $self->storage_dir(),
-		                        $name . '.' . $self->storage_extension() );
+    my ($self, $name) = @_;
+    return File::Spec->catfile( $self->storage_dir(),
+                                $name . '.' . $self->storage_extension() );
 }
 
 sub create
@@ -52,8 +52,8 @@ sub create
 
 sub exists
 {
-	my ($self, $address) = @_;
-	return -e $self->storage_file( $address );
+    my ($self, $address) = @_;
+    return -e $self->storage_file( $address );
 }
 
 sub save
@@ -90,8 +90,8 @@ sub fetch
     close IN;
 
     return $self->stored_class->new(
-		%{ Load( $data ) }, name => $name
-	);
+        %{ Load( $data ) }, name => $name
+    );
 }
 
 1;
@@ -104,7 +104,7 @@ Mail::Action::Storage - manages storage for Mail::Action and descendants
 
 =head1 SYNOPSIS
 
-	use base 'Mail::Action::Storage';
+    use base 'Mail::Action::Storage';
 
 =head1 DESCRIPTION
 
@@ -189,5 +189,5 @@ subclassing and extending this class.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, chromatic.  All rights reserved.  This module is
-distributed under the same terms as Perl itself.  Convenient for you!
+Copyright (c) 2003 - 2009 chromatic.  Some rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.10 itself.

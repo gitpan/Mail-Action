@@ -8,12 +8,12 @@ use Test::MockObject;
 
 my $mock = Test::MockObject->new();
 $mock->fake_module( 'Pod::Simple::Text',
-	VERSION  => sub { 1 },
-	map { 
-		my $sub = $_; 
-		$mock->set_always( $sub => $sub );
-		$sub => sub { shift; $mock->$sub( @_ ) }
-	} qw( start_head1 start_item_bullet end_item_bullet handle_text end_head1 )
+    VERSION  => sub { 1 },
+    map {
+        my $sub = $_;
+        $mock->set_always( $sub => $sub );
+        $sub => sub { shift; $mock->$sub( @_ ) }
+    } qw( start_head1 start_item_bullet end_item_bullet handle_text end_head1 )
 );
 
 my $module = 'Mail::Action::PodToHelp';
@@ -32,25 +32,25 @@ is( $result, 'start_head1', '... returning results' );
 
 for my $testmeth (qw( start_item_bullet end_item_bullet ))
 {
-	can_ok( $module, $testmeth );
-	$p2h->{_show} = 1;
-	$result = $p2h->$testmeth( 'args' );
-	($method, $args) = $mock->next_call();
-	is( $method, $testmeth, "$testmeth() should call parent" );
-	is( $args->[1], 'args', '... with args' );
-	is( $result, $testmeth, '... returning results' );
-	$p2h->{_show} = 0;
+    can_ok( $module, $testmeth );
+    $p2h->{_show} = 1;
+    $result = $p2h->$testmeth( 'args' );
+    ($method, $args) = $mock->next_call();
+    is( $method, $testmeth, "$testmeth() should call parent" );
+    is( $args->[1], 'args', '... with args' );
+    is( $result, $testmeth, '... returning results' );
+    $p2h->{_show} = 0;
 
-	is( $p2h->$testmeth(),
-		undef,              '... unless show flag is disabled' );
+    is( $p2h->$testmeth(),
+        undef,              '... unless show flag is disabled' );
 }
 
 can_ok( $module, 'show_headings' );
 $p2h->show_headings( 'first', 'second' );
 is_deeply(
-	$p2h->{_show_headings},
-	{ first => 1, second => 1 },
-	'show_headings() should save passed in headings' );
+    $p2h->{_show_headings},
+    { first => 1, second => 1 },
+    'show_headings() should save passed in headings' );
 
 can_ok( $module, 'handle_text' );
 $p2h->{_show} = 0;

@@ -4,61 +4,61 @@ use strict;
 use warnings;
 
 use vars '$VERSION';
-$VERSION = '0.42';
+$VERSION = '0.45';
 
 use Class::Roles multi =>
 {
-	address_expires    => [qw( expires process_time )],
-	address_named      => [qw( name )],
-	address_described  => [qw( description )],
+    address_expires    => [qw( expires process_time )],
+    address_named      => [qw( name )],
+    address_described  => [qw( description )],
 };
 
 sub description
 {
-	my $self             = shift;
-	$self->{description} = shift if @_;
+    my $self             = shift;
+    $self->{description} = shift if @_;
 
-	return '' unless exists $self->{description};
-	return                  $self->{description};
+    return '' unless exists $self->{description};
+    return                  $self->{description};
 }
 
 sub name
 {
-	my $self       = shift;
-	($self->{name} = shift) =~ tr/-A-Za-z0-9_//cd if @_;
-	return $self->{name};
+    my $self       = shift;
+    ($self->{name} = shift) =~ tr/-A-Za-z0-9_//cd if @_;
+    return $self->{name};
 }
 
 sub expires
 {
-	my $self = shift;
-	$self->{expires} = $self->process_time( shift ) + time() if @_;
-	$self->{expires} = 0 unless $self->{expires};
-	return $self->{expires};
+    my $self = shift;
+    $self->{expires} = $self->process_time( shift ) + time() if @_;
+    $self->{expires} = 0 unless $self->{expires};
+    return $self->{expires};
 }
 
 sub process_time
 {
-	my ($self, $time) = @_;
-	return $time unless $time =~ tr/0-9//c;
+    my ($self, $time) = @_;
+    return $time unless $time =~ tr/0-9//c;
 
-	my %times = (
-		m =>                60,
-		h =>           60 * 60,
-		d =>      24 * 60 * 60,
-		w =>  7 * 24 * 60 * 60,
-		M => 30 * 24 * 60 * 60,
-	);
+    my %times = (
+        m =>                60,
+        h =>           60 * 60,
+        d =>      24 * 60 * 60,
+        w =>  7 * 24 * 60 * 60,
+        M => 30 * 24 * 60 * 60,
+    );
 
-	my $units    = join('', keys %times);
-	my $seconds; 
+    my $units    = join('', keys %times);
+    my $seconds;
 
-	while ( $time =~ s/(\d+)([$units])// )
-	{
-		$seconds += $1 * $times{ $2 };
-	}
+    while ( $time =~ s/(\d+)([$units])// )
+    {
+        $seconds += $1 * $times{ $2 };
+    }
 
-	return $seconds;
+    return $seconds;
 }
 
 1;
@@ -70,12 +70,12 @@ Mail::Action::Address - roles applicable to individual addresses
 
 =head1 SYNOPSIS
 
-	use Mail::Action::Address;
+    use Mail::Action::Address;
 
-	use Class::Roles
-		does => 'address_expires',
-		does => 'address_named',
-		does => 'address_described';
+    use Class::Roles
+        does => 'address_expires',
+        does => 'address_named',
+        does => 'address_described';
 
 =head1 DESCRIPTION
 
@@ -165,5 +165,5 @@ L<Class::Roles>, L<Mail::TempAddress::Address>, L<Mail::SimpleList::Alias>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003, 2005 chromatic.  All rights reserved.  You may use, modify,
-and distribute this module under the same terms as Perl 5.8.x itself.
+Copyright (c) 2003 - 2009 chromatic.  Some rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.10 itself.

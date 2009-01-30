@@ -7,6 +7,7 @@ lib/Mail/Action.pm
 lib/Mail/Action/Address.pm
 lib/Mail/Action/AddressTest.pm
 lib/Mail/Action/Request.pm
+lib/Mail/Action/RequestTest.pm
 lib/Mail/Action/Storage.pm
 lib/Mail/Action/StorageTest.pm
 lib/Mail/Action/Test.pm
@@ -16,8 +17,6 @@ t/action.t
 t/address.t
 t/address_desc.t
 t/address_roles.t
-t/developer/pod.t
-t/developer/pod-coverage.t
 t/podtohelp.t
 t/request.t
 t/storage.t

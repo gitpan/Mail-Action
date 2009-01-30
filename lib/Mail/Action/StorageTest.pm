@@ -30,7 +30,7 @@ sub startup :Test( startup => 2 )
 sub shutdown :Test( shutdown )
 {
     my $self = shift;
-	rmtree $self->storage_dir() unless $ENV{PERL_TEST_DEBUG};
+    rmtree $self->storage_dir() unless $ENV{PERL_TEST_DEBUG};
 }
 
 sub setup :Test( setup => 1 )
@@ -143,8 +143,8 @@ package Mail::Action::RealAddress;
 
 sub new
 {
-	my ($class, %args) = @_;
-	bless \%args, $class;
+    my ($class, %args) = @_;
+    bless \%args, $class;
 }
 
 package Mail::Action::StorageSub;

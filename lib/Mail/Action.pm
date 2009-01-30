@@ -1,9 +1,10 @@
 package Mail::Action;
 
 use strict;
+use warnings;
 
 use vars '$VERSION';
-$VERSION = '0.42';
+$VERSION = '0.45';
 
 use Carp 'croak';
 
@@ -14,138 +15,138 @@ use Mail::Action::PodToHelp;
 
 sub new
 {
-	my ($class, $address_dir, @options, %options, $fh) = @_;
-	croak "No address directory provided\n" unless $address_dir;
+    my ($class, $address_dir, @options, %options, $fh) = @_;
+    croak "No address directory provided\n" unless $address_dir;
 
-	if (@options == 1)
-	{
-		$fh      = $options[0];
-	}
-	else
-	{
-		%options = @options if @options;
-		$fh      = $options{Filehandle} if exists $options{Filehandle};
-	}
+    if (@options == 1)
+    {
+        $fh      = $options[0];
+    }
+    else
+    {
+        %options = @options if @options;
+        $fh      = $options{Filehandle} if exists $options{Filehandle};
+    }
 
-	my $storage  = $class->storage_class();
+    my $storage  = $class->storage_class();
 
-	unless ($options{Request})
-	{
-		$fh             ||= \*STDIN;
-		$fh               = do { local $/; <$fh> } if defined( fileno( $fh ) );
-		$options{Request} = Mail::Action::Request->new( $fh );
-	}
+    unless ($options{Request})
+    {
+        $fh             ||= \*STDIN;
+        $fh               = do { local $/; <$fh> } if defined( fileno( $fh ) );
+        $options{Request} = Mail::Action::Request->new( $fh );
+    }
 
-	$options{Storage} ||= $options{Addresses};
-	$options{Storage}   = $storage->new($address_dir) unless $options{Storage};
+    $options{Storage} ||= $options{Addresses};
+    $options{Storage}   = $storage->new($address_dir) unless $options{Storage};
 
-	bless \%options, $class;
+    bless \%options, $class;
 }
 
 sub storage
 {
-	my $self = shift;
-	   $self->{Storage};
+    my $self = shift;
+       $self->{Storage};
 }
 
 sub request
 {
-	my $self = shift;
-	   $self->{Request};
+    my $self = shift;
+       $self->{Request};
 }
 
 # try to avoid this one from now on
 sub message
 {
-	my $self    = shift;
-	my $request = $self->request();
-	   $request->message();
+    my $self    = shift;
+    my $request = $self->request();
+       $request->message();
 }
 
 sub fetch_address
 {
-	my $self      = shift;
-	my $alias     = $self->parse_alias( $self->request->recipient() );
-	my $addresses = $self->storage();
+    my $self      = shift;
+    my $alias     = $self->parse_alias( $self->request->recipient() );
+    my $addresses = $self->storage();
 
-	return unless $addresses->exists( $alias );
+    return unless $addresses->exists( $alias );
 
-	my $addy      = $addresses->fetch( $alias );
+    my $addy      = $addresses->fetch( $alias );
 
-	return wantarray ? ( $addy, $alias ) : $addy;
+    return wantarray ? ( $addy, $alias ) : $addy;
 }
 
 sub command_help
 {
-	my ($self, $pod, @headings) = @_;
-	my $request                 = $self->request();
+    my ($self, $pod, @headings) = @_;
+    my $request                 = $self->request();
 
-	my $from   = $request->header( 'From' )->address();
-	my $parser = Mail::Action::PodToHelp->new();
+    my $from   = $request->header( 'From' )->address();
+    my $parser = Mail::Action::PodToHelp->new();
 
-	$parser->show_headings( @headings );
-	$parser->output_string( \( my $output ));
-	$parser->parse_string_document( $pod );
+    $parser->show_headings( @headings );
+    $parser->output_string( \( my $output ));
+    $parser->parse_string_document( $pod );
 
-	$output =~ s/(\A\s+|\s+\Z)//g;
+    $output =~ s/(\A\s+|\s+\Z)//g;
 
-	$self->reply({
-		To      => $from,
-		Subject => ref( $self ) . ' Help'
-	}, $output );
+    $self->reply({
+        To      => $from,
+        Subject => ref( $self ) . ' Help'
+    }, $output );
 }
 
 sub process_body
 {
-	my ($self, $address) = @_;
-	my $attributes       = $address->attributes();
-	my $body             = $self->request->remove_sig();
+    my ($self, $address) = @_;
+    my $attributes       = $address->attributes();
+    my $body             = $self->request->remove_sig();
 
-	while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
-	{
-		my ($directive, $value) = (lc( $1 ), $2);
-		$address->$directive( $value ) if exists $attributes->{ $directive };
-		shift @$body;
-	}
+    while (@$body and $body->[0] =~ /^(\w+):\s*(.*)$/)
+    {
+        my ($directive, $value) = (lc( $1 ), $2);
+        $address->$directive( $value ) if exists $attributes->{ $directive };
+        shift @$body;
+    }
 
-	return $body;
+    return $body;
 }
 
 sub reply
 {
-	my ($self, $headers, @body) = @_;
+    my ($self, $headers, @body) = @_;
 
-	my $mailer = Mail::Mailer->new();
-	$mailer->open( $headers );
-	$mailer->print( @body );
-	$mailer->close();
+    my $mailer = Mail::Mailer->new();
+    $mailer->open( $headers );
+    $mailer->print( @body );
+    $mailer->close();
 }
 
 sub find_command
 {
-	my $self      = shift;
-	my ($subject) = $self->request()->header( 'Subject' ) =~ /^\*(\w+)\*/;
+    my $self      = shift;
+    my ($subject) = $self->request()->header( 'Subject' ) =~ /^\*(\w+)\*/;
 
-	return unless $subject;
+    return unless $subject;
 
-	my $command   = 'command_' . lc $subject;
-	return $self->can( $command ) ? $command : '';
+    my $command   = 'command_' . lc $subject;
+    return $self->can( $command ) ? $command : '';
 }
 
 sub copy_headers
 {
-	my $self    = shift;
-	my $headers = $self->request()->headers();
+    my $self    = shift;
+    my $headers = $self->request()->headers();
 
-	my %copy;
+    my %copy;
 
-	while (my ($header, $value) = each %$headers)
-	{
-		next if $header eq 'From ';
-		$copy{ $header } = join(', ', @$value );
-	}
+    while (my ($header, $value) = each %$headers)
+    {
+        next if $header eq 'From ';
+        $copy{ $header } = join(', ', @$value );
+    }
 
-	return \%copy;
+    return \%copy;
 }
 
 1;
@@ -157,7 +158,7 @@ Mail::Action - base for building modules that act on incoming mail
 
 =head1 SYNOPSIS
 
-	use base 'Mail::Action';
+    use base 'Mail::Action';
 
 =head1 DESCRIPTION
 
@@ -176,7 +177,7 @@ filter, and respond to incoming e-mails.
 =over 4
 
 =item * new( $address_directory,
-	[ Filehandle => $fh, Storage => $storage, Request => $request ] )
+    [ Filehandle => $fh, Storage => $storage, Request => $request ] )
 
 C<new()> takes one mandatory argument and three optional arguments.
 C<$address_directory> is the path to the directory where address data is
@@ -223,7 +224,7 @@ e-mails that text to the C<From> address of the incoming message.
 
 Looks for lines of the form:
 
-	Directive: arguments
+    Directive: arguments
 
 at the I<start> of the body of the incoming message.  If the C<$address> object
 (likely L<Mail::Action::Address> or equivalent) understands the directive, this
@@ -284,5 +285,5 @@ No known bugs.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003 - 2005, chromatic.  All rights reserved.  You may use,
-modify, and distribute this module under the same terms as Perl 5.8.x itself.
+Copyright (c) 2003 - 2009 chromatic.  Some rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.10 itself.
