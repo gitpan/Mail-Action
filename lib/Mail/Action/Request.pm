@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars '$VERSION';
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 use Email::MIME;
 use Email::Address;

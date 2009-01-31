@@ -1,6 +1,6 @@
 #! perl
 
-BEGIN { require 5.00806 }
+BEGIN { require 5.008006 }
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ my $builder = Module::Build->new(
     requires    =>
     {
         'Class::Roles'           => '0.30',
-        'Email::Address'         => '',
+        'Email::Address'         => '1.889',
         'Email::MIME'            => '',
         'Email::MIME::Modifier'  => '',
         'Email::Simple'          => '',

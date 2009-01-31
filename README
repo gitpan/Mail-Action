@@ -1,7 +1,7 @@
 Mail::Action
 ------------
 
-Version 0.45
+Version 0.46
 
 Mail::Action is a set of modules for building modules to perform actions based
 on incoming messages.  See Mail::SimpleList and Mail::TempAddress for ideas.
